@@ -123,14 +123,24 @@
   .panel .kind { margin: 10px 0 0; font-size: 0.95rem; opacity: 0.8; }
   .panel .desc { margin: 20px 0 0; max-width: 46ch; font-size: 1.05rem; }
   .panel dl { margin: 22px 0 0; display: grid; gap: 4px; font-size: 0.95rem; }
-  .panel dt { font-weight: 600; }
-  .panel dd { margin: 0 0 8px; opacity: 0.9; }
+  .panel dl.meta dt { font-weight: 600; }
+  .panel dl.meta dd { margin: 0 0 8px; opacity: 0.9; }
   .btn {
     display: inline-block; margin-top: 8px; padding: 11px 18px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 0.97rem;
     background: var(--pf); color: var(--pb);
   }
   .btn:hover { filter: brightness(0.92); }
   .nosrc { margin-top: 8px; font-size: 0.95rem; opacity: 0.85; }
+  .ico { display: block; width: 64px; height: 64px; border-radius: 14px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
+  .tile .ico { position: absolute; top: 16px; left: 18px; width: 56px; height: 56px; margin: 0; border-radius: 13px; }
+  .extra { grid-column: 1 / -1; display: grid; gap: clamp(20px, 3vw, 32px); border-top: 1.5px solid color-mix(in srgb, var(--pf) 30%, transparent); padding-top: clamp(20px, 3vw, 32px); }
+  .facts { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 20px 28px; }
+  .fact dt { font-family: var(--display); font-weight: 400; font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; }
+  .fact dd { margin: 6px 0 0; font-size: 0.95rem; opacity: 0.9; max-width: 24ch; }
+  .facts-note { margin: 0; font-size: 0.88rem; opacity: 0.8; max-width: 70ch; }
+  .shot { margin: 0; }
+  .shot img { display: block; width: 100%; height: auto; border-radius: 3px; background: #fff; }
+  .shot figcaption { margin-top: 8px; font-size: 0.9rem; opacity: 0.85; }
   .steps-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
   .copy-all { font-size: 0.88rem; font-weight: 600; padding: 7px 13px; border-radius: 3px; border: 1.5px solid currentColor; background: transparent; cursor: pointer; }
   .copy-all:hover { background: var(--pf); color: var(--pb); }
@@ -263,7 +273,7 @@
 
   var APPS = [
     {
-      id: "softfall", name: "Softfall", type: "macOS app", size: "l", bg: "var(--lapis)", fg: "var(--bone)", art: "rain", c: "1 / 3", r: "1 / 3",
+      id: "softfall", icon: "softfall-icon.png", name: "Softfall", type: "macOS app", size: "l", bg: "var(--lapis)", fg: "var(--bone)", art: "rain", c: "1 / 3", r: "1 / 3",
       blurb: "Weather for your desktop, and the sound that goes with it. Rain, thunder and campfire scenes play over your screen while you work. Clicks pass straight through, and every sound is synthesised in real time instead of played from recordings.",
       stack: "Swift. macOS 14 or newer, Apple silicon and Intel.", repo: "softfall",
       steps: [
@@ -273,7 +283,16 @@
       ]
     },
     {
-      id: "floe", name: "Floe", type: "Data pipeline", size: "m", bg: "var(--teal)", fg: "var(--bone)", art: "wave", c: "3 / 6", r: "1 / 2",
+      id: "floe", name: "Floe", type: "Data pipeline",
+      shot: "floe-dashboard.png", shotAlt: "Grafana dashboard for Floe showing end-to-end freshness, ingest rate, Debezium connector status and replication slot lag",
+      shotCap: "The pipeline dashboard in Grafana: freshness, ingest rate, connector state and replication lag.",
+      factsNote: "Measured on one laptop (Apple silicon, 8 cores, Docker limited to 8 GB) with TPC-H sf1 and a 100 ops/s workload. Full method in the repo's report.",
+      facts: [
+        { n: "4,844", l: "rows per second loaded end to end" },
+        { n: "7.3 s", l: "median delay from PostgreSQL commit to Trino" },
+        { n: "3.25x", l: "faster query suite after optimisation" },
+        { n: "89%", l: "fewer objects in storage (2,151 down to 246)" }
+      ], size: "m", bg: "var(--teal)", fg: "var(--bone)", art: "wave", c: "3 / 6", r: "1 / 2",
       blurb: "Keeps an analytics-ready copy of a live PostgreSQL database in Apache Iceberg, seconds behind the source. Debezium, Kafka, Spark Structured Streaming, Trino and Airflow do the work, with Prometheus and Grafana watching it. A Cloud Computing semester project built with a teammate.",
       stack: "PostgreSQL, Debezium, Kafka, Spark, Iceberg, Trino, Airflow, Docker.", repo: "floe",
       steps: [
@@ -294,7 +313,11 @@
       ]
     },
     {
-      id: "paper-summarizer", name: "Paper Summarizer", type: "Web app", size: "m", bg: "#E8E3D3", fg: "#15171C", art: "page", c: "3 / 5", r: "2 / 4",
+      id: "paper-summarizer", name: "Paper Summarizer", type: "Web app",
+      facts: [
+        { n: "153", l: "offline tests: 129 Python and 24 frontend" },
+        { n: "5", l: "summaries per session per day on the free tier" }
+      ], size: "m", bg: "#E8E3D3", fg: "#15171C", art: "page", c: "3 / 5", r: "2 / 4",
       blurb: "Upload a research paper PDF or enter a DOI and get a structured summary. Each key finding carries a verbatim quote that the server looks up in the paper, so quotes it cannot find are marked unverified. It also draws a knowledge graph and answers questions about the paper.",
       stack: "FastAPI, Groq, Pydantic, PyMuPDF, SQLite.", repo: "AIResearchPaperSummarizer",
       steps: [
@@ -398,7 +421,7 @@
 
   wall.innerHTML = APPS.map(function (a, i) {
     return '<button type="button" class="tile ' + a.size + '" data-id="' + a.id + '" aria-pressed="false" style="--tb:' + a.bg + ";--tf:" + a.fg + ";--c:" + a.c + ";--r:" + a.r + ";--i:" + i + '">' +
-      art(a.art) + '<span class="nm">' + esc(a.name) + '</span><span class="ty">' + esc(a.type) + "</span></button>";
+      art(a.art) + (a.icon ? '<img class="ico" src="' + a.icon + '" alt="">' : "") + '<span class="nm">' + esc(a.name) + '</span><span class="ty">' + esc(a.type) + "</span></button>";
   }).join("");
 
   function select(id, scroll) {
@@ -413,10 +436,46 @@
     var src = a.repo
       ? '<a class="btn" href="' + GH + esc(a.repo) + '" target="_blank" rel="noopener">View source on GitHub</a>'
       : '<p class="nosrc">Source not public yet.</p>';
-    panel.innerHTML = '<div><h2>' + esc(a.name) + '</h2><p class="kind">' + esc(a.type) + '</p><p class="desc">' + esc(a.blurb) +
-      '</p><dl><dt>Built with</dt><dd>' + esc(a.stack) + "</dd></dl>" + src + "</div><div>" + right + "</div>";
+    var facts = "";
+    if (a.facts) {
+      facts = '<dl class="facts">' + a.facts.map(function (f) { return '<div class="fact"><dt>' + esc(f.n) + "</dt><dd>" + esc(f.l) + "</dd></div>"; }).join("") + "</dl>" +
+        (a.factsNote ? '<p class="facts-note">' + esc(a.factsNote) + "</p>" : "");
+    }
+    var shot = a.shot ? '<figure class="shot"><img src="' + a.shot + '" alt="' + esc(a.shotAlt) + '" loading="lazy"><figcaption>' + esc(a.shotCap) + "</figcaption></figure>" : "";
+    var extra = (facts || shot) ? '<div class="extra">' + facts + shot + "</div>" : "";
+    var icon = a.icon ? '<img class="ico" src="' + a.icon + '" alt="' + esc(a.name) + ' app icon">' : "";
+    panel.innerHTML = '<div>' + icon + '<h2>' + esc(a.name) + '</h2><p class="kind">' + esc(a.type) + '</p><p class="desc">' + esc(a.blurb) +
+      '</p><dl class="meta"><dt>Built with</dt><dd>' + esc(a.stack) + '</dd><dt>On GitHub</dt><dd id="gh-meta">' + (a.repo ? "Checking for updates" : "Not public yet") + "</dd></dl>" + src + "</div><div>" + right + "</div>" + extra;
+    if (a.repo) loadMeta(a);
     try { history.replaceState(null, "", "#" + a.id); } catch (e) {}
     if (scroll) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  var metaCache = {};
+  function ago(iso) {
+    var d = (Date.now() - new Date(iso).getTime()) / 86400000;
+    if (d < 1) return "today";
+    if (d < 2) return "yesterday";
+    if (d < 30) return Math.floor(d) + " days ago";
+    if (d < 365) { var m = Math.floor(d / 30); return m + (m === 1 ? " month ago" : " months ago"); }
+    var y = Math.floor(d / 365); return y + (y === 1 ? " year ago" : " years ago");
+  }
+  function showMeta(a, m) {
+    var el = document.getElementById("gh-meta");
+    if (!el || current !== a.id) return;
+    if (!m) { el.textContent = "Open source on GitHub"; return; }
+    var bits = ["Last pushed " + ago(m.pushed_at)];
+    if (m.stargazers_count) bits.push(m.stargazers_count + (m.stargazers_count === 1 ? " star" : " stars"));
+    if (m.license && m.license.spdx_id && m.license.spdx_id !== "NOASSERTION") bits.push(m.license.spdx_id + " license");
+    el.textContent = bits.join(". ") + ".";
+  }
+  function loadMeta(a) {
+    if (metaCache[a.id] !== undefined) { showMeta(a, metaCache[a.id]); return; }
+    try {
+      fetch("https://api.github.com/repos/zorhehs/" + a.repo).then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (m) { metaCache[a.id] = m; showMeta(a, m); })
+        .catch(function () { metaCache[a.id] = null; showMeta(a, null); });
+    } catch (e) { showMeta(a, null); }
   }
 
   wall.addEventListener("click", function (e) {
