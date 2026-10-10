@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tessera</title>
+<meta name="description" content="Tessera is a small software studio. Apps for macOS and the web, built one piece at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one column, mosaic strip under the headline, app cards in a wrapping grid. */
+  :root {
+    --bg: #F3F5F9;
+    --card: #FFFFFF;
+    --fg: #14182B;
+    --muted: #586079;
+    --line: #D9DEEA;
+    --accent: #2B3FE0;
+    --accent-ink: #FFFFFF;
+    --tile-empty: #E6EAF3;
+    --t1: #2B3FE0;
+    --t2: #12A594;
+    --t3: #F2A93B;
+    --t4: #E8604C;
+    --t5: #8A94B8;
+    --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F1224;
+      --card: #171B33;
+      --fg: #EEF0F8;
+      --muted: #9AA1BD;
+      --line: #272C4A;
+      --accent: #8593FF;
+      --accent-ink: #0F1224;
+      --tile-empty: #1A1F3B;
+      --t1: #5568F2;
+      --t2: #2BC2AE;
+      --t3: #F4B652;
+      --t4: #F07C69;
+      --t5: #6F79A0;
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    padding-inline: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding-block: 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand-mark {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 26px; height: 26px;
+  }
+  .brand-mark i { display: block; border-radius: 3px; }
+  .brand-mark i:nth-child(1) { background: var(--t1); }
+  .brand-mark i:nth-child(2) { background: var(--t3); }
+  .brand-mark i:nth-child(3) { background: var(--t2); }
+  .brand-mark i:nth-child(4) { background: var(--t4); }
+  .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; }
+  nav.links { display: flex; gap: 22px; font-size: 0.95rem; }
+  nav.links a { text-decoration: none; color: var(--muted); }
+  nav.links a:hover { color: var(--fg); }
+
+  .hero { padding-block: 56px 28px; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(2.5rem, 7.5vw, 5rem); line-height: 1.02; letter-spacing: -0.03em;
+    margin: 0; max-width: 14ch; text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { max-width: 56ch; color: var(--muted); font-size: 1.15rem; margin: 22px 0 0; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
+    border-radius: 10px; font-weight: 600; font-size: 0.98rem; text-decoration: none;
+    border: 1.5px solid var(--fg);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.ghost:hover { background: var(--card); }
+
+  .mosaic {
+    --cols: 12;
+    display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 6px;
+    margin-block: 40px 20px;
+  }
+  .mosaic i { display: block; aspect-ratio: 1; border-radius: 6px; transition: transform 0.25s ease; }
+  .mosaic i:hover { transform: scale(0.82); }
+  @media (max-width: 600px) { .mosaic { --cols: 8; gap: 4px; } .mosaic i { border-radius: 4px; } }
+
+  section { padding-block: 56px; }
+  .section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
+  h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+    letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance;
+  }
+  .section-sub { color: var(--muted); margin: 8px 0 0; max-width: 52ch; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--font-mono); font-size: 0.82rem; padding: 7px 14px; border-radius: 999px;
+    border: 1.5px solid var(--line); background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--fg); color: var(--fg); }
+  .chip[aria-pressed="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+
+  .apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 20px; }
+  .app {
+    display: flex; flex-direction: column; min-width: 0;
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .app:hover { transform: translateY(-3px); border-color: var(--fg); }
+  .app-art { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; padding: 14px; background: var(--tile-empty); }
+  .app-art i { display: block; aspect-ratio: 1; border-radius: 3px; }
+  .app-art img { grid-column: 1 / -1; width: 100%; display: block; border-radius: 6px; }
+  .app-body { display: flex; flex-direction: column; gap: 12px; padding: 22px; flex: 1; }
+  .app-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .app h3 { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: -0.01em; margin: 0; }
+  .platform { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .app p { margin: 0; color: var(--muted); font-size: 0.98rem; }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
+  .stack span { font-family: var(--font-mono); font-size: 0.74rem; padding: 4px 9px; border-radius: 6px; background: var(--tile-empty); }
+  .app-links { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 600; font-size: 0.95rem; padding-top: 6px; }
+  .app-links a { color: var(--accent); text-decoration: none; border-bottom: 1.5px solid transparent; }
+  .app-links a:hover { border-bottom-color: var(--accent); }
+
+  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 32px; }
+  .principle { min-width: 0; border-top: 3px solid var(--fg); padding-top: 16px; }
+  .principle:nth-child(1) { border-top-color: var(--t1); }
+  .principle:nth-child(2) { border-top-color: var(--t2); }
+  .principle:nth-child(3) { border-top-color: var(--t3); }
+  .principle h3 { font-family: var(--font-display); font-size: 1.25rem; margin: 0 0 8px; }
+  .principle p { margin: 0; color: var(--muted); font-size: 0.98rem; }
+
+  .contact { text-align: left; }
+  .contact-box {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px;
+    background: var(--fg); color: var(--bg); border-radius: 20px; padding: clamp(28px, 5vw, 52px);
+  }
+  .contact-box h2 { max-width: 16ch; }
+  .contact-box p { margin: 10px 0 0; opacity: 0.75; max-width: 44ch; }
+  .contact-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .contact-box .btn { border-color: var(--bg); color: var(--bg); }
+  .contact-box .btn.primary { background: var(--bg); color: var(--fg); border-color: var(--bg); }
+  .email-text { font-family: var(--font-mono); font-size: 0.95rem; align-self: center; user-select: all; }
+
+  footer {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+    padding-block: 28px 44px; color: var(--muted); font-size: 0.9rem; border-top: 1.5px solid var(--line);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+  @media (max-width: 520px) { nav.links { gap: 14px; } .hero { padding-top: 36px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="#top" aria-label="Tessera home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="brand-name">Tessera</span>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#apps">Apps</a>
+      <a href="#approach">Approach</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <p class="eyebrow">Independent software studio</p>
+      <h1>Small software, built <em>piece by piece.</em></h1>
+      <p class="lede">Tessera is a studio for apps that do one job well. Each one is a single tile: finished on its own, and part of a bigger picture.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#apps">See the apps</a>
+        <a class="btn ghost" href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub profile</a>
+      </div>
+      <div class="mosaic" id="mosaic" aria-hidden="true"></div>
+    </div>
+
+    <section id="apps">
+      <div class="section-head">
+        <div>
+          <h2>The apps</h2>
+          <p class="section-sub">Everything shipped so far, with source on GitHub.</p>
+        </div>
+        <div class="filters" id="filters" role="group" aria-label="Filter apps by platform"></div>
+      </div>
+      <div class="apps" id="apps-grid"></div>
+    </section>
+
+    <section id="approach">
+      <div class="section-head"><h2>How Tessera builds</h2></div>
+      <div class="principles">
+        <div class="principle">
+          <h3>One job per app</h3>
+          <p>Every app starts from a single problem. If a feature doesn't serve it, it doesn't ship.</p>
+        </div>
+        <div class="principle">
+          <h3>Open source first</h3>
+          <p>The code is public on GitHub, so you can read exactly what an app does before you run it.</p>
+        </div>
+        <div class="principle">
+          <h3>Honest descriptions</h3>
+          <p>Every line on this site describes what the app really does today, nothing more.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="contact-box">
+        <div>
+          <h2>Want to talk about an app?</h2>
+          <p>Feedback, bug reports and ideas are welcome. The quickest route is an issue on the app's GitHub repository.</p>
+        </div>
+        <div class="contact-actions" id="contact-actions">
+          <a class="btn primary" href="https://github.com/zorhehs" target="_blank" rel="noopener">Open GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year">2026</span> Tessera</span>
+    <span>Built by Shehroz Riaz</span>
+  </footer>
+</div>
+
+<script>
+  /* To add an app: copy one block in APPS and edit it. To show a real screenshot instead of the
+     generated tile pattern, put the image file next to index.html and set image: "shot.png". */
+  var EMAIL = "hello@teseera.tech";
+
+  var APPS = [
+    {
+      name: "Softfall",
+      platform: "macOS",
+      blurb: "An ambient weather app for macOS.",
+      stack: ["macOS"],
+      links: [{ label: "Source", url: "https://github.com/zorhehs/softfall" }],
+      image: ""
+    },
+    {
+      name: "Jahaaz",
+      platform: "Web",
+      blurb: "A flight tracking tool with a live map. It pulls flight data from VATSIM, weather from Open-Meteo and place lookups from Nominatim.",
+      stack: ["React", "Vite", "Tailwind", "Leaflet"],
+      links: [{ label: "Source", url: "https://github.com/zorhehs/Jahaaz" }],
+      image: ""
+    },
+    {
+      name: "Paper Summarizer",
+      platform: "Web",
+      blurb: "Summarizes research papers and ties each claim to the exact spot in the PDF. Citations are checked on the server, and clicking one highlights its source passage.",
+      stack: ["FastAPI", "Gemini", "Groq", "PyMuPDF"],
+      links: [{ label: "Source", url: "https://github.com/zorhehs/AIResearchPaperSummarizer" }],
+      image: ""
+    }
+  ];
+
+  var PALETTE = ["var(--t1)", "var(--t2)", "var(--t3)", "var(--t4)", "var(--t5)"];
+
+  function seeded(str) {
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      h ^= h >>> 16;
+      return (h >>> 0) / 4294967296;
+    };
+  }
+
+  function tiles(seed, count, fill) {
+    var rnd = seeded(seed), out = "";
+    for (var i = 0; i < count; i++) {
+      var on = rnd() < fill;
+      var c = PALETTE[Math.floor(rnd() * PALETTE.length)];
+      out += on ? '<i style="background:' + c + '"></i>' : "<i></i>";
+    }
+    return out;
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  document.getElementById("mosaic").innerHTML = tiles("tessera", 48, 0.55)
+    .replace(/<i><\/i>/g, '<i style="background:var(--tile-empty)"></i>');
+
+  var grid = document.getElementById("apps-grid");
+  var filtersEl = document.getElementById("filters");
+  var active = "All";
+
+  function renderApps() {
+    var list = APPS.filter(function (a) { return active === "All" || a.platform === active; });
+    grid.innerHTML = list.map(function (a) {
+      var art = a.image
+        ? '<img src="' + esc(a.image) + '" alt="' + esc(a.name) + ' screenshot">'
+        : tiles(a.name, 32, 0.6);
+      var stack = a.stack.map(function (s) { return "<span>" + esc(s) + "</span>"; }).join("");
+      var links = a.links.map(function (l) {
+        return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.label) + " &rarr;</a>";
+      }).join("");
+      return '<article class="app"><div class="app-art" aria-hidden="true">' + art + "</div>" +
+        '<div class="app-body"><div class="app-top"><h3>' + esc(a.name) + '</h3><span class="platform">' +
+        esc(a.platform) + "</span></div><p>" + esc(a.blurb) + '</p><div class="stack">' + stack +
+        '</div><div class="app-links">' + links + "</div></div></article>";
+    }).join("");
+  }
+
+  function renderFilters() {
+    var platforms = ["All"];
+    APPS.forEach(function (a) { if (platforms.indexOf(a.platform) < 0) platforms.push(a.platform); });
+    filtersEl.hidden = platforms.length < 3;
+    filtersEl.innerHTML = platforms.map(function (p) {
+      return '<button type="button" class="chip" data-p="' + esc(p) + '" aria-pressed="' + (p === active) + '">' + esc(p) + "</button>";
+    }).join("");
+  }
+
+  filtersEl.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-p]");
+    if (!b) return;
+    active = b.getAttribute("data-p");
+    renderFilters();
+    renderApps();
+  });
+
+  if (EMAIL) {
+    var box = document.getElementById("contact-actions");
+    box.insertAdjacentHTML("afterbegin",
+      '<a class="btn primary" href="mailto:' + esc(EMAIL) + '">Email us</a><span class="email-text">' + esc(EMAIL) + "</span>");
+  }
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  renderFilters();
+  renderApps();
+</script>
+</body>
+</html>
