@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tessera</title>
 <meta name="description" content="Tessera is a small software studio. Pick a project, read what it does, and copy the Terminal commands that install it on a Mac.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#D9D6CC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151A" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://teseera.tech/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tessera">
+<meta property="og:title" content="Tessera">
+<meta property="og:description" content="Small programs, set one tile at a time. Pick a project, read what it does, and copy the Terminal commands that install it on a Mac.">
+<meta property="og:url" content="https://teseera.tech/">
+<meta property="og:image" content="https://teseera.tech/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Schibsted+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -120,7 +131,11 @@
   }
   .btn:hover { filter: brightness(0.92); }
   .nosrc { margin-top: 8px; font-size: 0.95rem; opacity: 0.85; }
-  .steps-head { margin: 0 0 14px; font-family: var(--display); font-weight: 400; font-size: 1.5rem; }
+  .steps-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .copy-all { font-size: 0.88rem; font-weight: 600; padding: 7px 13px; border-radius: 3px; border: 1.5px solid currentColor; background: transparent; cursor: pointer; }
+  .copy-all:hover { background: var(--pf); color: var(--pb); }
+  .copy-all.done { background: #CDE8B8; border-color: #CDE8B8; color: #15301A; }
+  .steps-head { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.5rem; }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; counter-reset: s; }
   .step { counter-increment: s; min-width: 0; }
   .step-title { display: flex; align-items: baseline; gap: 10px; font-weight: 600; margin-bottom: 7px; }
@@ -164,6 +179,10 @@
   .contact .mail { font-family: var(--mono); font-size: 0.95rem; user-select: all; }
 
   footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding-block: 32px 44px; color: var(--muted); font-size: 0.92rem; }
+
+  .foot-links { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+  .foot-links a { text-decoration: none; }
+  .foot-links a:hover { color: var(--ink); text-decoration: underline; }
 
   @media (max-width: 860px) { .panel { grid-template-columns: 1fr; } }
   @media (max-width: 520px) { .links { gap: 14px; font-size: 0.9rem; } .links a.hide-s { display: none; } .note { margin-left: 0; } }
@@ -222,8 +241,13 @@
   </main>
 
   <footer>
-    <span>&copy; <span id="year">2026</span> Tessera</span>
-    <span>Built by Shehroz Riaz</span>
+    <span>&copy; <span id="year">2026</span> Tessera. Built by Shehroz Riaz.</span>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="#wall">Projects</a>
+      <a href="#setup">Mac setup</a>
+      <a href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub</a>
+      <a href="#top">Back to top</a>
+    </nav>
   </footer>
 </div>
 
@@ -244,8 +268,8 @@
       stack: "Swift. macOS 14 or newer, Apple silicon and Intel.", repo: "softfall",
       steps: [
         { t: "Install with Homebrew", c: "brew tap zorhehs/softfall https://github.com/zorhehs/softfall\nbrew install --cask softfall", n: "The cask clears the quarantine flag for you." },
-        { t: "Or build it from source", c: "git clone https://github.com/zorhehs/softfall.git\ncd softfall\nScripts/build-app.sh --dev\nopen dist/SoftfallDev.app", n: "Builds Softfall Dev, a separate copy that can run next to an installed Softfall." },
-        { t: "If macOS refuses to open the .zip you installed by hand", c: "xattr -dr com.apple.quarantine /Applications/Softfall.app", n: "Release builds are ad-hoc signed, not notarised. Right-click then Open also works." }
+        { t: "Or build it from source", c: "git clone https://github.com/zorhehs/softfall.git\ncd softfall\nScripts/build-app.sh --dev\nopen dist/SoftfallDev.app", n: "Builds Softfall Dev, a separate copy that can run next to an installed Softfall.", alt: true },
+        { t: "If macOS refuses to open the .zip you installed by hand", c: "xattr -dr com.apple.quarantine /Applications/Softfall.app", n: "Release builds are ad-hoc signed, not notarised. Right-click then Open also works.", alt: true }
       ]
     },
     {
@@ -384,7 +408,7 @@
     panel.style.setProperty("--pb", a.bg);
     panel.style.setProperty("--pf", a.fg);
     var right = a.steps.length
-      ? '<h3 class="steps-head">Install on your Mac</h3><ol class="steps">' + stepsHtml(a.steps) + "</ol>"
+      ? '<div class="steps-top"><h3 class="steps-head">Install on your Mac</h3><button type="button" class="copy-all" data-all="' + esc(a.steps.filter(function (x) { return !x.alt; }).map(function (x) { return x.c; }).join("\n")) + '">Copy all steps</button></div><ol class="steps">' + stepsHtml(a.steps) + "</ol>"
       : '<h3 class="steps-head">No install steps yet</h3><p class="empty">The source for ' + esc(a.name) + " isn't public, so there is nothing to clone or install. This page will get the steps when it is.</p>";
     var src = a.repo
       ? '<a class="btn" href="' + GH + esc(a.repo) + '" target="_blank" rel="noopener">View source on GitHub</a>'
@@ -400,10 +424,22 @@
     if (t) select(t.getAttribute("data-id"), window.innerWidth < 780);
   });
 
-  function copyText(text, btn) {
+  wall.addEventListener("keydown", function (e) {
+    var keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!keys[e.key]) return;
+    var tiles = Array.prototype.slice.call(wall.children);
+    var i = tiles.indexOf(document.activeElement);
+    if (i < 0) return;
+    e.preventDefault();
+    var n = tiles[(i + keys[e.key] + tiles.length) % tiles.length];
+    n.focus();
+  });
+
+  function copyText(text, btn, label) {
+    label = label || "Copy";
     function ok() {
       btn.textContent = "Copied"; btn.classList.add("done");
-      setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1500);
+      setTimeout(function () { btn.textContent = label; btn.classList.remove("done"); }, 1500);
     }
     function fallback() {
       try {
@@ -421,7 +457,9 @@
 
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button[data-copy]");
-    if (b) copyText(b.getAttribute("data-copy"), b);
+    if (b) { copyText(b.getAttribute("data-copy"), b); return; }
+    var all = e.target.closest("button[data-all]");
+    if (all) copyText(all.getAttribute("data-all"), all, "Copy all steps");
   });
 
   document.getElementById("setup-steps").innerHTML = stepsHtml(SETUP);
