@@ -4,12 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tessera</title>
-<meta name="description" content="Tessera is a small software studio. Apps for macOS and the web, built one piece at a time.">
+<meta name="description" content="Tessera is a small software studio. Apps, tools and data projects for macOS and the web, each with Terminal install steps for Mac.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Layout: one column, mosaic strip under the headline, app cards in a wrapping grid. */
   :root {
     --bg: #F3F5F9;
     --card: #FFFFFF;
@@ -24,6 +23,10 @@
     --t3: #F2A93B;
     --t4: #E8604C;
     --t5: #8A94B8;
+    --term-bg: #0E1122;
+    --term-fg: #DCE1F5;
+    --term-dim: #7C86AA;
+    --term-line: #242A48;
     --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
     --font-body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -44,75 +47,92 @@
       --t3: #F4B652;
       --t4: #F07C69;
       --t5: #6F79A0;
+      --term-bg: #0A0C19;
       color-scheme: dark;
     }
   }
 
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font-body);
-    font-size: 17px;
-    line-height: 1.6;
-    padding-inline: 20px;
-    -webkit-font-smoothing: antialiased;
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+    padding-inline: 20px; -webkit-font-smoothing: antialiased;
   }
   a { color: inherit; }
   :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-
-  .wrap { max-width: 1080px; margin: 0 auto; }
+  .wrap { max-width: 1120px; margin: 0 auto; }
 
   header.top {
+    position: sticky; top: 0; z-index: 20;
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    padding-block: 22px;
+    padding-block: 16px; margin-inline: -20px; padding-inline: 20px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1.5px solid transparent;
   }
+  header.top.scrolled { border-bottom-color: var(--line); }
   .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-  .brand-mark {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 26px; height: 26px;
-  }
+  .brand-mark { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 26px; height: 26px; }
   .brand-mark i { display: block; border-radius: 3px; }
   .brand-mark i:nth-child(1) { background: var(--t1); }
   .brand-mark i:nth-child(2) { background: var(--t3); }
   .brand-mark i:nth-child(3) { background: var(--t2); }
   .brand-mark i:nth-child(4) { background: var(--t4); }
   .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; }
-  nav.links { display: flex; gap: 22px; font-size: 0.95rem; }
+  nav.links { display: flex; gap: 22px; font-size: 0.95rem; align-items: center; }
   nav.links a { text-decoration: none; color: var(--muted); }
   nav.links a:hover { color: var(--fg); }
+  nav.links a.gh { color: var(--fg); font-weight: 600; border: 1.5px solid var(--line); padding: 6px 14px; border-radius: 999px; }
+  nav.links a.gh:hover { border-color: var(--fg); }
 
-  .hero { padding-block: 56px 28px; }
-  .eyebrow {
-    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted); margin: 0 0 18px;
-  }
+  .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 44px; align-items: center; padding-block: 52px 36px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
   h1 {
     font-family: var(--font-display); font-weight: 700;
-    font-size: clamp(2.5rem, 7.5vw, 5rem); line-height: 1.02; letter-spacing: -0.03em;
-    margin: 0; max-width: 14ch; text-wrap: balance;
+    font-size: clamp(2.5rem, 6.4vw, 4.6rem); line-height: 1.02; letter-spacing: -0.03em;
+    margin: 0; text-wrap: balance;
   }
   h1 em { font-style: normal; color: var(--accent); }
-  .lede { max-width: 56ch; color: var(--muted); font-size: 1.15rem; margin: 22px 0 0; }
+  .lede { max-width: 54ch; color: var(--muted); font-size: 1.15rem; margin: 22px 0 0; }
   .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .btn {
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
     border-radius: 10px; font-weight: 600; font-size: 0.98rem; text-decoration: none;
-    border: 1.5px solid var(--fg);
+    border: 1.5px solid var(--fg); background: transparent; color: var(--fg); cursor: pointer; font-family: inherit;
   }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .btn.primary:hover { filter: brightness(1.08); }
   .btn.ghost:hover { background: var(--card); }
 
-  .mosaic {
-    --cols: 12;
-    display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 6px;
-    margin-block: 40px 20px;
+  .stats { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 34px; }
+  .stat b { display: block; font-family: var(--font-display); font-size: 1.9rem; line-height: 1; letter-spacing: -0.02em; }
+  .stat span { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+  .term {
+    background: var(--term-bg); color: var(--term-fg); border-radius: 14px; overflow: hidden;
+    border: 1.5px solid var(--term-line); box-shadow: 0 18px 50px -24px rgba(20, 24, 43, 0.55);
+    min-width: 0;
   }
+  .term-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--term-line); }
+  .term-bar i { width: 11px; height: 11px; border-radius: 50%; background: #3A4166; display: block; }
+  .term-bar i:nth-child(1) { background: #E8604C; }
+  .term-bar i:nth-child(2) { background: #F2A93B; }
+  .term-bar i:nth-child(3) { background: #12A594; }
+  .term-bar span { margin-left: 8px; font-family: var(--font-mono); font-size: 0.74rem; color: var(--term-dim); }
+  .term pre {
+    margin: 0; padding: 16px 18px; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.7;
+    overflow-x: auto; white-space: pre; tab-size: 2;
+  }
+  .term pre .p { color: var(--t2); user-select: none; }
+  .term pre .o { color: var(--term-dim); }
+  .hero-term pre { min-height: 230px; }
+  .caret { display: inline-block; width: 8px; height: 1em; background: var(--term-fg); vertical-align: text-bottom; animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .mosaic { --cols: 16; display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 6px; margin-block: 8px 12px; }
   .mosaic i { display: block; aspect-ratio: 1; border-radius: 6px; transition: transform 0.25s ease; }
   .mosaic i:hover { transform: scale(0.82); }
-  @media (max-width: 600px) { .mosaic { --cols: 8; gap: 4px; } .mosaic i { border-radius: 4px; } }
 
   section { padding-block: 56px; }
   .section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 28px; }
@@ -120,7 +140,7 @@
     font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4.5vw, 2.6rem);
     letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance;
   }
-  .section-sub { color: var(--muted); margin: 8px 0 0; max-width: 52ch; }
+  .section-sub { color: var(--muted); margin: 8px 0 0; max-width: 56ch; }
 
   .filters { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
@@ -130,26 +150,60 @@
   .chip:hover { border-color: var(--fg); color: var(--fg); }
   .chip[aria-pressed="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 
-  .apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 20px; }
+  .apps { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 20px; align-items: start; }
   .app {
     display: flex; flex-direction: column; min-width: 0;
     background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: border-color 0.2s ease;
   }
-  .app:hover { transform: translateY(-3px); border-color: var(--fg); }
-  .app-art { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; padding: 14px; background: var(--tile-empty); }
+  .app:hover, .app.open { border-color: var(--fg); }
+  .app.open { grid-column: 1 / -1; }
+  .app-art { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; padding: 14px; background: var(--tile-empty); }
   .app-art i { display: block; aspect-ratio: 1; border-radius: 3px; }
-  .app-art img { grid-column: 1 / -1; width: 100%; display: block; border-radius: 6px; }
+  .app.open .app-art { max-height: 62px; overflow: hidden; }
   .app-body { display: flex; flex-direction: column; gap: 12px; padding: 22px; flex: 1; }
   .app-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .app h3 { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: -0.01em; margin: 0; }
   .platform { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-  .app p { margin: 0; color: var(--muted); font-size: 0.98rem; }
-  .stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 4px; }
+  .app p.blurb { margin: 0; color: var(--muted); font-size: 0.98rem; }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px; }
   .stack span { font-family: var(--font-mono); font-size: 0.74rem; padding: 4px 9px; border-radius: 6px; background: var(--tile-empty); }
-  .app-links { display: flex; flex-wrap: wrap; gap: 18px; font-weight: 600; font-size: 0.95rem; padding-top: 6px; }
-  .app-links a { color: var(--accent); text-decoration: none; border-bottom: 1.5px solid transparent; }
-  .app-links a:hover { border-bottom-color: var(--accent); }
+  .app-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: auto; padding-top: 8px; }
+  .app-actions a.src { color: var(--accent); font-weight: 600; font-size: 0.95rem; text-decoration: none; border-bottom: 1.5px solid transparent; }
+  .app-actions a.src:hover { border-bottom-color: var(--accent); }
+  .btn.small { padding: 8px 14px; font-size: 0.88rem; border-radius: 8px; }
+  .nosrc { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+
+  .install { display: none; border-top: 1.5px solid var(--line); padding: 22px; background: var(--bg); }
+  .app.open .install { display: block; }
+  .install-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .install-head h4 { font-family: var(--font-display); font-size: 1.15rem; margin: 0; }
+  .install-head span { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+  .steps { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; counter-reset: s; }
+  .step { counter-increment: s; min-width: 0; }
+  .step-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+  .step-title::before {
+    content: counter(s); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px;
+    background: var(--fg); color: var(--bg); font-family: var(--font-mono); font-size: 0.74rem; flex: none;
+  }
+  .code { position: relative; }
+  .code pre {
+    margin: 0; padding: 14px 84px 14px 16px; background: var(--term-bg); color: var(--term-fg);
+    border-radius: 10px; border: 1.5px solid var(--term-line);
+    font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.7; overflow-x: auto; white-space: pre;
+  }
+  .copy {
+    position: absolute; top: 8px; right: 8px; font-family: var(--font-mono); font-size: 0.72rem;
+    padding: 5px 10px; border-radius: 7px; border: 1px solid var(--term-line); background: #1B2040;
+    color: var(--term-fg); cursor: pointer;
+  }
+  .copy:hover { background: #262D58; }
+  .copy.done { background: var(--t2); border-color: var(--t2); color: #06241F; }
+  .step-note { margin: 6px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+  .setup { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 40px; align-items: start; }
+  .setup .steps { gap: 18px; }
+  .setup-aside p { color: var(--muted); margin: 10px 0 0; }
 
   .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 32px; }
   .principle { min-width: 0; border-top: 3px solid var(--fg); padding-top: 16px; }
@@ -159,7 +213,6 @@
   .principle h3 { font-family: var(--font-display); font-size: 1.25rem; margin: 0 0 8px; }
   .principle p { margin: 0; color: var(--muted); font-size: 0.98rem; }
 
-  .contact { text-align: left; }
   .contact-box {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px;
     background: var(--fg); color: var(--bg); border-radius: 20px; padding: clamp(28px, 5vw, 52px);
@@ -176,74 +229,105 @@
     padding-block: 28px 44px; color: var(--muted); font-size: 0.9rem; border-top: 1.5px solid var(--line);
   }
 
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 32px; }
+    .setup { grid-template-columns: 1fr; gap: 24px; }
+    .mosaic { --cols: 10; }
+  }
+  @media (max-width: 520px) {
+    nav.links { gap: 12px; font-size: 0.88rem; }
+    nav.links a.hide-s { display: none; }
+    .mosaic { --cols: 8; gap: 4px; }
+    .install { padding: 16px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     * { transition: none !important; }
+    .caret { animation: none; }
   }
-  @media (max-width: 520px) { nav.links { gap: 14px; } .hero { padding-top: 36px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header class="top">
+  <header class="top" id="topbar">
     <a class="brand" href="#top" aria-label="Tessera home">
       <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="brand-name">Tessera</span>
     </a>
     <nav class="links" aria-label="Main">
-      <a href="#apps">Apps</a>
-      <a href="#approach">Approach</a>
-      <a href="#contact">Contact</a>
+      <a href="#projects">Projects</a>
+      <a class="hide-s" href="#setup">Mac setup</a>
+      <a class="hide-s" href="#approach">Approach</a>
+      <a class="hide-s" href="#contact">Contact</a>
+      <a class="gh" href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </header>
 
   <main id="top">
     <div class="hero">
-      <p class="eyebrow">Independent software studio</p>
-      <h1>Small software, built <em>piece by piece.</em></h1>
-      <p class="lede">Tessera is a studio for apps that do one job well. Each one is a single tile: finished on its own, and part of a bigger picture.</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#apps">See the apps</a>
-        <a class="btn ghost" href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub profile</a>
+      <div>
+        <p class="eyebrow">Independent software studio</p>
+        <h1>Small software, built <em>piece by piece.</em></h1>
+        <p class="lede">Tessera makes apps, tools and data projects, each one a single tile that works on its own. Source is public on GitHub, and each project comes with Terminal install steps for Mac.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#projects">Browse projects</a>
+          <a class="btn ghost" href="#setup">Set up your Mac</a>
+        </div>
+        <div class="stats" id="stats"></div>
       </div>
-      <div class="mosaic" id="mosaic" aria-hidden="true"></div>
+      <div class="term hero-term" aria-label="Example Terminal session">
+        <div class="term-bar"><i></i><i></i><i></i><span>Terminal</span></div>
+<pre id="hero-pre"></pre>
+      </div>
     </div>
 
-    <section id="apps">
+    <div class="mosaic" id="mosaic" aria-hidden="true"></div>
+
+    <section id="projects">
       <div class="section-head">
         <div>
-          <h2>The apps</h2>
-          <p class="section-sub">Everything shipped so far, with source on GitHub.</p>
+          <h2>Projects</h2>
+          <p class="section-sub">Pick a project and press Install to see the Mac Terminal steps. Each command has a Copy button.</p>
         </div>
-        <div class="filters" id="filters" role="group" aria-label="Filter apps by platform"></div>
+        <div class="filters" id="filters" role="group" aria-label="Filter projects by type"></div>
       </div>
       <div class="apps" id="apps-grid"></div>
+    </section>
+
+    <section id="setup">
+      <div class="setup">
+        <div class="setup-aside">
+          <h2>Set up your Mac</h2>
+          <p>Most projects need only a few tools. Install Homebrew once, then add whatever a project asks for. Run these in the Terminal app.</p>
+        </div>
+        <ol class="steps" id="setup-steps"></ol>
+      </div>
     </section>
 
     <section id="approach">
       <div class="section-head"><h2>How Tessera builds</h2></div>
       <div class="principles">
         <div class="principle">
-          <h3>One job per app</h3>
-          <p>Every app starts from a single problem. If a feature doesn't serve it, it doesn't ship.</p>
+          <h3>One job per project</h3>
+          <p>Every project starts from a single problem. If a feature doesn't serve it, it doesn't ship.</p>
         </div>
         <div class="principle">
           <h3>Open source first</h3>
-          <p>The code is public on GitHub, so you can read exactly what an app does before you run it.</p>
+          <p>The code is public on GitHub wherever possible, so you can read exactly what a project does before you run it.</p>
         </div>
         <div class="principle">
           <h3>Honest descriptions</h3>
-          <p>Every line on this site describes what the app really does today, nothing more.</p>
+          <p>Every line on this site describes what the project really does today, taken from its own README.</p>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="contact">
+    <section id="contact">
       <div class="contact-box">
         <div>
-          <h2>Want to talk about an app?</h2>
-          <p>Feedback, bug reports and ideas are welcome. The quickest route is an issue on the app's GitHub repository.</p>
+          <h2>Want to talk about a project?</h2>
+          <p>Feedback, bug reports and ideas are welcome. The quickest route is an issue on the project's GitHub repository.</p>
         </div>
         <div class="contact-actions" id="contact-actions">
           <a class="btn primary" href="https://github.com/zorhehs" target="_blank" rel="noopener">Open GitHub</a>
@@ -259,34 +343,103 @@
 </div>
 
 <script>
-  /* To add an app: copy one block in APPS and edit it. To show a real screenshot instead of the
-     generated tile pattern, put the image file next to index.html and set image: "shot.png". */
   var EMAIL = "hello@teseera.tech";
+  var GH = "https://github.com/zorhehs/";
+
+  var SETUP = [
+    { t: "Install Apple's command line tools", c: "xcode-select --install", n: "Gives you git and make. Skip it if it says they are already installed." },
+    { t: "Install Homebrew", c: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"', n: "Follow the on-screen instructions, including the commands it prints for your PATH." },
+    { t: "Install the tools the projects use", c: "brew install git go node python@3.11", n: "Go for commitcraft, Node for Forme, Python for the Python projects. Add only what you need." }
+  ];
 
   var APPS = [
     {
-      name: "Softfall",
-      platform: "macOS",
-      blurb: "An ambient weather app for macOS.",
-      stack: ["macOS"],
-      links: [{ label: "Source", url: "https://github.com/zorhehs/softfall" }],
-      image: ""
+      name: "Softfall", type: "macOS App", platform: "macOS",
+      blurb: "Weather for your desktop, and the sound that goes with it. Rain, thunder and campfire scenes play over your screen while you work. Clicks pass straight through, and every sound is synthesised in real time rather than played from recordings.",
+      stack: ["Swift", "macOS 14+", "Apple silicon + Intel"],
+      repo: "softfall",
+      steps: [
+        { t: "Install with Homebrew", c: "brew tap zorhehs/softfall https://github.com/zorhehs/softfall\nbrew install --cask softfall", n: "Needs macOS 14 or newer. The cask clears the quarantine flag for you." },
+        { t: "Or build it from source", c: "git clone https://github.com/zorhehs/softfall.git\ncd softfall\nScripts/build-app.sh --dev\nopen dist/SoftfallDev.app", n: "Builds Softfall Dev, a separate copy that can run next to an installed Softfall." },
+        { t: "If you installed the .zip by hand and macOS refuses to open it", c: "xattr -dr com.apple.quarantine /Applications/Softfall.app", n: "Release builds are ad-hoc signed, not notarised. Right-click then Open also works." }
+      ]
     },
     {
-      name: "Jahaaz",
-      platform: "Web",
+      name: "commitcraft", type: "CLI Tool", platform: "CLI",
+      blurb: "Drafts a Conventional Commits message from your staged git diff. No API key, no network call, no setup. An optional local Ollama backend is available, and it falls back to the offline one if Ollama isn't running.",
+      stack: ["Go", "git", "Ollama (optional)"],
+      repo: "commitcraft",
+      steps: [
+        { t: "Install Go", c: "brew install go", n: "commitcraft needs Go 1.22 or newer." },
+        { t: "Install commitcraft", c: "go install github.com/zorhehs/commitcraft/cmd/commitcraft@latest", n: "The binary lands in your Go bin folder." },
+        { t: "Put the Go bin folder on your PATH", c: "echo 'export PATH=\"$PATH:$(go env GOPATH)/bin\"' >> ~/.zshrc\nsource ~/.zshrc", n: "Skip this if commitcraft already runs." },
+        { t: "Use it", c: "git add <files>\ncommitcraft\ncommitcraft --body\ncommitcraft --apply", n: "Run it inside any git repo after staging files." }
+      ]
+    },
+    {
+      name: "Forme", type: "Web App", platform: "Web",
+      blurb: "A visual, section-based website builder. Build a single-page site, edit its content and styling, preview desktop, tablet and mobile layouts, and export HTML and CSS that works without the editor.",
+      stack: ["React", "Express", "Node.js 22.12+", "MongoDB (optional)"],
+      repo: "forme",
+      steps: [
+        { t: "Install Node.js", c: "brew install node", n: "Forme needs Node.js 22.12 or newer. Check with node -v." },
+        { t: "Get the code and install dependencies", c: "git clone https://github.com/zorhehs/forme.git\ncd forme\nnpm ci" },
+        { t: "Start the editor", c: "npm run dev", n: "Then open http://127.0.0.1:5173. A local JSON store is created on first start." }
+      ]
+    },
+    {
+      name: "Paper Summarizer", type: "Web App", platform: "Web",
+      blurb: "Upload a research paper PDF or enter a DOI and get a structured summary. Each key finding carries a verbatim quote that the server looks up in the paper, so quotes it cannot find are marked unverified. Also draws a knowledge graph and answers questions about the paper.",
+      stack: ["FastAPI", "Groq", "Pydantic", "PyMuPDF", "SQLite"],
+      repo: "AIResearchPaperSummarizer",
+      steps: [
+        { t: "Install Python and Tesseract", c: "brew install python@3.11 tesseract", n: "Tesseract is optional. It is only used to read scanned PDFs." },
+        { t: "Get the code and install dependencies", c: "git clone https://github.com/zorhehs/AIResearchPaperSummarizer.git\ncd AIResearchPaperSummarizer\npython3.11 -m venv venv\n./venv/bin/pip install -r requirements.txt" },
+        { t: "Add your Groq API key", c: "echo 'GROQ_API_KEY=your_key_here' > .env", n: "Replace your_key_here with your own key from Groq. Without a key it can only use a local Ollama model." },
+        { t: "Run it", c: "cd src\n../venv/bin/uvicorn api:app --port 8000", n: "Then open http://127.0.0.1:8000." }
+      ]
+    },
+    {
+      name: "Floe", type: "Data Pipeline", platform: "Data",
+      blurb: "A change data capture lakehouse that keeps an analytics-ready copy of a live PostgreSQL database in Apache Iceberg, seconds behind the source. Debezium, Kafka, Spark Structured Streaming, Trino, Airflow, and Prometheus with Grafana for monitoring. Built as a Cloud Computing semester project with a teammate.",
+      stack: ["PostgreSQL", "Debezium", "Kafka", "Spark", "Iceberg", "Trino", "Airflow"],
+      repo: "floe",
+      steps: [
+        { t: "Install Docker Desktop", c: "brew install --cask docker", n: "Open it once, and give Docker 8 GB or more of memory (10 to 12 GB recommended). You need about 10 GB of free disk." },
+        { t: "Get the code", c: "git clone https://github.com/zorhehs/floe.git\ncd floe" },
+        { t: "Set up and run the demo", c: "./scripts/setup.sh\n./scripts/run_demo.sh", n: "Grafana opens at http://localhost:3000. Add --full to run_demo.sh for the full benchmark." },
+        { t: "Stop and clean up", c: "./scripts/cleanup.sh", n: "Add --volumes to also delete the data." }
+      ]
+    },
+    {
+      name: "Phishing URL Detector", type: "Machine Learning", platform: "ML",
+      blurb: "Estimates whether a URL is a phishing link. It splits the URL into word tokens, turns them into TF-IDF features and scores them with a logistic regression model. It includes a command line check and a small Flask page. The repo's sample data is only six rows, so train on a bigger labelled set for real use.",
+      stack: ["Python", "scikit-learn", "Flask"],
+      repo: "PhishingURLDetector",
+      steps: [
+        { t: "Get the code and install dependencies", c: "git clone https://github.com/zorhehs/PhishingURLDetector.git\ncd PhishingURLDetector\npython3 -m venv venv\nsource venv/bin/activate\npip install -r requirements.txt flask" },
+        { t: "Train the model", c: "python -m src.train data/urls.csv model.joblib" },
+        { t: "Check a URL from the Terminal", c: "python -m src.predict model.joblib http://secure-bank-update-login.com" },
+        { t: "Or start the web page", c: "python -m src.app", n: "Then open http://127.0.0.1:5001." }
+      ]
+    },
+    {
+      name: "Sudoku Solver", type: "Game + Solver", platform: "Web",
+      blurb: "A Sudoku game and solver. The solver treats the puzzle as a constraint satisfaction problem and fills it with backtracking. Play in a Flask web app with hints, answer checking and a two-player mode, or in the Terminal.",
+      stack: ["Python", "Flask", "Backtracking"],
+      repo: "SudokuSolver",
+      steps: [
+        { t: "Get the code and install dependencies", c: "git clone https://github.com/zorhehs/SudokuSolver.git\ncd SudokuSolver\npython3 -m venv venv\nsource venv/bin/activate\npip install -r requirements.txt" },
+        { t: "Play in the browser", c: "python -m src.app", n: "Then open http://127.0.0.1:5002." },
+        { t: "Or play in the Terminal", c: "python -m src.run" }
+      ]
+    },
+    {
+      name: "Jahaaz", type: "Web App", platform: "Web",
       blurb: "A flight tracking tool with a live map. It pulls flight data from VATSIM, weather from Open-Meteo and place lookups from Nominatim.",
       stack: ["React", "Vite", "Tailwind", "Leaflet"],
-      links: [{ label: "Source", url: "https://github.com/zorhehs/Jahaaz" }],
-      image: ""
-    },
-    {
-      name: "Paper Summarizer",
-      platform: "Web",
-      blurb: "Summarizes research papers and ties each claim to the exact spot in the PDF. Citations are checked on the server, and clicking one highlights its source passage.",
-      stack: ["FastAPI", "Gemini", "Groq", "PyMuPDF"],
-      links: [{ label: "Source", url: "https://github.com/zorhehs/AIResearchPaperSummarizer" }],
-      image: ""
+      repo: "",
+      steps: []
     }
   ];
 
@@ -311,7 +464,7 @@
     for (var i = 0; i < count; i++) {
       var on = rnd() < fill;
       var c = PALETTE[Math.floor(rnd() * PALETTE.length)];
-      out += on ? '<i style="background:' + c + '"></i>' : "<i></i>";
+      out += on ? '<i style="background:' + c + '"></i>' : '<i style="background:var(--tile-empty);filter:brightness(0.97)"></i>';
     }
     return out;
   }
@@ -322,34 +475,61 @@
     });
   }
 
-  document.getElementById("mosaic").innerHTML = tiles("tessera", 48, 0.55)
-    .replace(/<i><\/i>/g, '<i style="background:var(--tile-empty)"></i>');
+  document.getElementById("mosaic").innerHTML = tiles("tessera", 48, 0.55);
+
+  var withInstall = APPS.filter(function (a) { return a.steps.length; }).length;
+  var platformsSeen = [];
+  APPS.forEach(function (a) { if (platformsSeen.indexOf(a.platform) < 0) platformsSeen.push(a.platform); });
+  document.getElementById("stats").innerHTML =
+    '<div class="stat"><b>' + APPS.length + '</b><span>Projects</span></div>' +
+    '<div class="stat"><b>' + withInstall + '</b><span>Mac install guides</span></div>' +
+    '<div class="stat"><b>' + platformsSeen.length + '</b><span>Kinds of software</span></div>';
+
+  function stepsHtml(steps) {
+    return steps.map(function (s) {
+      return '<li class="step"><div class="step-title">' + esc(s.t) + '</div>' +
+        '<div class="code"><pre>' + esc(s.c) + '</pre><button type="button" class="copy" data-copy="' + esc(s.c) + '">Copy</button></div>' +
+        (s.n ? '<p class="step-note">' + esc(s.n) + "</p>" : "") + "</li>";
+    }).join("");
+  }
+
+  document.getElementById("setup-steps").innerHTML = stepsHtml(SETUP);
 
   var grid = document.getElementById("apps-grid");
   var filtersEl = document.getElementById("filters");
   var active = "All";
+  var openName = "";
 
   function renderApps() {
     var list = APPS.filter(function (a) { return active === "All" || a.platform === active; });
-    grid.innerHTML = list.map(function (a) {
-      var art = a.image
-        ? '<img src="' + esc(a.image) + '" alt="' + esc(a.name) + ' screenshot">'
-        : tiles(a.name, 32, 0.6);
+    grid.innerHTML = list.map(function (a, idx) {
       var stack = a.stack.map(function (s) { return "<span>" + esc(s) + "</span>"; }).join("");
-      var links = a.links.map(function (l) {
-        return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.label) + " &rarr;</a>";
-      }).join("");
-      return '<article class="app"><div class="app-art" aria-hidden="true">' + art + "</div>" +
-        '<div class="app-body"><div class="app-top"><h3>' + esc(a.name) + '</h3><span class="platform">' +
-        esc(a.platform) + "</span></div><p>" + esc(a.blurb) + '</p><div class="stack">' + stack +
-        '</div><div class="app-links">' + links + "</div></div></article>";
+      var isOpen = openName === a.name;
+      var actions = "";
+      if (a.steps.length) {
+        actions += '<button type="button" class="btn small primary" data-install="' + esc(a.name) + '" aria-expanded="' + isOpen + '">' +
+          (isOpen ? "Hide install" : "Install") + "</button>";
+      }
+      if (a.repo) {
+        actions += '<a class="src" href="' + GH + esc(a.repo) + '" target="_blank" rel="noopener">Source &rarr;</a>';
+      } else {
+        actions += '<span class="nosrc">Source not public yet</span>';
+      }
+      var install = "";
+      if (a.steps.length) {
+        install = '<div class="install"><div class="install-head"><h4>Install ' + esc(a.name) + ' on Mac</h4><span>Terminal, macOS</span></div>' +
+          '<ol class="steps">' + stepsHtml(a.steps) + "</ol></div>";
+      }
+      return '<article class="app' + (isOpen ? " open" : "") + '" id="app-' + idx + '">' +
+        '<div class="app-art" aria-hidden="true">' + tiles(a.name, 20, 0.6) + "</div>" +
+        '<div class="app-body"><div class="app-top"><h3>' + esc(a.name) + '</h3><span class="platform">' + esc(a.type) + "</span></div>" +
+        '<p class="blurb">' + esc(a.blurb) + '</p><div class="stack">' + stack + '</div>' +
+        '<div class="app-actions">' + actions + "</div></div>" + install + "</article>";
     }).join("");
   }
 
   function renderFilters() {
-    var platforms = ["All"];
-    APPS.forEach(function (a) { if (platforms.indexOf(a.platform) < 0) platforms.push(a.platform); });
-    filtersEl.hidden = platforms.length < 3;
+    var platforms = ["All"].concat(platformsSeen);
     filtersEl.innerHTML = platforms.map(function (p) {
       return '<button type="button" class="chip" data-p="' + esc(p) + '" aria-pressed="' + (p === active) + '">' + esc(p) + "</button>";
     }).join("");
@@ -359,15 +539,98 @@
     var b = e.target.closest("button[data-p]");
     if (!b) return;
     active = b.getAttribute("data-p");
+    openName = "";
     renderFilters();
     renderApps();
   });
 
+  grid.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-install]");
+    if (!b) return;
+    var name = b.getAttribute("data-install");
+    openName = openName === name ? "" : name;
+    renderApps();
+    if (openName) {
+      var el = grid.querySelector(".app.open");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  function copyText(text, btn) {
+    function ok() {
+      btn.textContent = "Copied";
+      btn.classList.add("done");
+      setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1500);
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(ok, fallback);
+        return;
+      }
+    } catch (err) {}
+    fallback();
+    function fallback() {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+        document.body.removeChild(ta); ok();
+      } catch (err2) { btn.textContent = "Press Cmd+C"; }
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-copy]");
+    if (b) copyText(b.getAttribute("data-copy"), b);
+  });
+
+  var topbar = document.getElementById("topbar");
+  function onScroll() { topbar.classList.toggle("scrolled", window.scrollY > 8); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
   if (EMAIL) {
-    var box = document.getElementById("contact-actions");
-    box.insertAdjacentHTML("afterbegin",
+    document.getElementById("contact-actions").insertAdjacentHTML("afterbegin",
       '<a class="btn primary" href="mailto:' + esc(EMAIL) + '">Email us</a><span class="email-text">' + esc(EMAIL) + "</span>");
   }
+
+  var heroLines = [
+    { p: "$ ", t: "brew tap zorhehs/softfall https://github.com/zorhehs/softfall" },
+    { p: "$ ", t: "brew install --cask softfall" },
+    { p: "$ ", t: "go install github.com/zorhehs/commitcraft/cmd/commitcraft@latest" },
+    { p: "$ ", t: "git add . && commitcraft" },
+    { o: "feat(auth): add internal/auth/login.go" }
+  ];
+  var heroPre = document.getElementById("hero-pre");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function heroStatic() {
+    heroPre.innerHTML = heroLines.map(function (l) {
+      return l.o ? '<span class="o">' + esc(l.o) + "</span>" : '<span class="p">' + esc(l.p) + "</span>" + esc(l.t);
+    }).join("\n") + '\n<span class="p">$ </span><span class="caret"></span>';
+  }
+
+  function heroType() {
+    var done = "", li = 0, ci = 0;
+    function render(cur) {
+      heroPre.innerHTML = done + cur + '<span class="caret"></span>';
+    }
+    function tick() {
+      if (li >= heroLines.length) { heroStatic(); return; }
+      var l = heroLines[li];
+      if (l.o) {
+        done += '<span class="o">' + esc(l.o) + "</span>\n"; li++; ci = 0; render(""); setTimeout(tick, 380); return;
+      }
+      ci++;
+      render('<span class="p">' + esc(l.p) + "</span>" + esc(l.t.slice(0, ci)));
+      if (ci >= l.t.length) {
+        done += '<span class="p">' + esc(l.p) + "</span>" + esc(l.t) + "\n"; li++; ci = 0; setTimeout(tick, 420);
+      } else { setTimeout(tick, 22); }
+    }
+    tick();
+  }
+
+  if (reduce) heroStatic(); else heroType();
 
   document.getElementById("year").textContent = new Date().getFullYear();
   renderFilters();
