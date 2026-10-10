@@ -190,6 +190,19 @@
 
   footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding-block: 32px 44px; color: var(--muted); font-size: 0.92rem; }
 
+  .faq { padding-block: clamp(56px, 8vw, 104px) 0; }
+  .faq-list { margin-top: 28px; display: grid; gap: var(--gap); max-width: 860px; }
+  .faq-list details { background: var(--bone); color: #15171C; border-radius: 3px; }
+  @media (prefers-color-scheme: dark) { .faq-list details { background: #1D2027; color: #ECE9DE; } }
+  .faq-list summary { cursor: pointer; padding: 18px 56px 18px 20px; font-family: var(--display); font-size: 1.2rem; line-height: 1.25; list-style: none; position: relative; }
+  .faq-list summary::-webkit-details-marker { display: none; }
+  .faq-list summary::after { content: "+"; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-family: var(--body); font-size: 1.5rem; line-height: 1; transition: transform 0.2s ease; }
+  .faq-list details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+  .faq-list .ans { padding: 0 20px 20px; max-width: 64ch; }
+  .faq-list .ans p { margin: 0 0 10px; }
+  .faq-list .ans p:last-child { margin-bottom: 0; }
+  .faq-list a { text-decoration: underline; text-underline-offset: 3px; }
+  .contact .btn.alt { background: transparent; color: #15171C; border: 1.5px solid #15171C; }
   .foot-links { display: flex; flex-wrap: wrap; gap: 6px 22px; }
   .foot-links a { text-decoration: none; }
   .foot-links a:hover { color: var(--ink); text-decoration: underline; }
@@ -214,6 +227,7 @@
     <nav class="links" aria-label="Main">
       <a href="#wall">Projects</a>
       <a class="hide-s" href="#setup">Mac setup</a>
+      <a class="hide-s" href="#faq">FAQ</a>
       <a class="hide-s" href="#contact">Contact</a>
       <a class="gh" href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub</a>
     </nav>
@@ -243,9 +257,14 @@
       </ul>
     </section>
 
+    <section class="faq" id="faq">
+      <h3 class="sec">Questions people ask</h3>
+      <div class="faq-list" id="faq-list"></div>
+    </section>
+
     <section class="contact" id="contact">
       <h3>Found a bug or have an idea?</h3>
-      <p>Open an issue on the project's GitHub repository, or write to us directly.</p>
+      <p>Open an issue on the project's GitHub repository, write to us, or find us on GitHub and LinkedIn.</p>
       <div class="row" id="contact-row"></div>
     </section>
   </main>
@@ -254,8 +273,11 @@
     <span>&copy; <span id="year">2026</span> Tessera. Built by Shehroz Riaz.</span>
     <nav class="foot-links" aria-label="Footer">
       <a href="#wall">Projects</a>
-      <a href="#setup">Mac setup</a>
+      <a href="#faq">FAQ</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
       <a href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/zorhehs" target="_blank" rel="noopener">LinkedIn</a>
       <a href="#top">Back to top</a>
     </nav>
   </footer>
@@ -521,10 +543,25 @@
     if (all) copyText(all.getAttribute("data-all"), all, "Copy all steps");
   });
 
+  var FAQ = [
+    { q: "Is everything here free to use?", a: ["Every project with public source can be read, cloned and run for free. Each repository states its own license: Softfall, commitcraft, Floe and Paper Summarizer say MIT in their READMEs. Check the repository for the others before reusing the code."] },
+    { q: "Do the install steps work on Windows or Linux?", a: ["The guides are written for the Terminal on a Mac. Softfall is a macOS app and needs macOS 14 or newer. The Python, Node and Go projects may run elsewhere, but they haven't been tested there."] },
+    { q: "macOS says it can't open Softfall. What do I do?", a: ["Release builds are signed ad hoc and not notarised by Apple, so macOS blocks a .zip you installed by hand. Open the Softfall tile and run the xattr command listed under the install steps, or right-click the app and choose Open. Installing with Homebrew clears this for you."] },
+    { q: "Why does Jahaaz have no install steps?", a: ["Its source code isn't public yet, so there is nothing to clone. Its tile will get install steps if that changes."] },
+    { q: "Are the Terminal commands safe to run?", a: ["Read each command before you run it. They come from each project's README, and the Homebrew line is the official installer from Homebrew. Anything that needs a key, such as the Groq API key for Paper Summarizer, uses your own."] },
+    { q: "Does this site track me?", a: ["No. There are no accounts, cookies, ads or analytics. Fonts load from Google and project details load from GitHub, which see your address when that happens. The Privacy page explains it in full."] },
+    { q: "How do I report a bug or suggest an idea?", a: ['Open an issue on the project\'s GitHub repository. For anything else, write to <a href="mailto:' + EMAIL + '">' + EMAIL + "</a>."] },
+    { q: "Who builds Tessera?", a: ["Tessera is a studio of one, built by Shehroz Riaz. Floe is the one project built with a teammate."] }
+  ];
+  document.getElementById("faq-list").innerHTML = FAQ.map(function (f) {
+    return "<details><summary>" + esc(f.q) + '</summary><div class="ans">' + f.a.map(function (t) { return "<p>" + t + "</p>"; }).join("") + "</div></details>";
+  }).join("");
+
   document.getElementById("setup-steps").innerHTML = stepsHtml(SETUP);
   document.getElementById("contact-row").innerHTML =
     '<a class="btn" href="mailto:' + esc(EMAIL) + '">Email us</a><span class="mail">' + esc(EMAIL) + '</span>' +
-    '<a class="btn" href="https://github.com/zorhehs" target="_blank" rel="noopener">Open GitHub</a>';
+    '<a class="btn alt" href="https://github.com/zorhehs" target="_blank" rel="noopener">GitHub</a>' +
+    '<a class="btn alt" href="https://www.linkedin.com/in/zorhehs" target="_blank" rel="noopener">LinkedIn</a>';
   document.getElementById("year").textContent = new Date().getFullYear();
 
   select(location.hash.replace("#", ""), false);
